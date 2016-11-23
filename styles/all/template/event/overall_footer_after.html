@@ -1,4 +1,4 @@
-<!-- IF S_VIEWTOPIC or S_IN_UCP or S_IN_POSTING -->
+<!-- IF S_VIEWTOPIC or S_IN_UCP or S_IN_POSTING or S_RECENT_TOPICS -->
 <!-- INCLUDEJS @tatiana5_tosrus/hammer.min.js -->
 <!-- INCLUDEJS @tatiana5_tosrus/lib/FlameViewportScale.js -->
 <!-- INCLUDEJS @tatiana5_tosrus/jquery.tosrus.all.min.js -->
@@ -28,6 +28,26 @@ function add_tosrus(e, elements) {
 		}
 	});
 }
+
+function separate_add_tosrus(e, elements) {
+	elements.find("dl.thumbnail a").addClass("tosrus");
+	elements.find(".attach-image img").each(function() {
+		var i = $(this).attr("src");
+		$(this).wrap('<a class="tosrus" href="' + i + '"></a>');
+	});
+
+	elements.find('.attachbox').each(function() {
+		$(this).parent('.postbody').find('a.tosrus').tosrus({
+			pagination : {
+				add        : true,
+				type       : "thumbnails"
+			},
+			wrapper    : {
+				classes    : "img-border"
+			}
+		});
+	});
+}
 $(document).ready(function (e) {
 	add_tosrus(e, $(document));
 });
@@ -35,5 +55,6 @@ $('#qr_posts').on('qr_completed', add_tosrus);
 $('#qr_postform').on('ajax_submit_preview', function (e) {
 	add_tosrus(e, $('#preview'));
 });
+$('#recent_topics').on('recent_topics_success', separate_add_tosrus);
 </script>
 <!-- ENDIF -->
