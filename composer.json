@@ -3,7 +3,7 @@
     "type": "phpbb-extension",
     "description": "phpBB 3.1 Tosrus slider",
     "homepage": "http://phpbbguru.net/community",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "time": "2016-11-21",
     "license": "GPL-2.0",
     "authors": [

@@ -7,17 +7,90 @@
 jQuery(function( $ ) {
 	$.tosrus.defaults.media.image = {
 		filterAnchors: function( $anchor ) {
-			return true;
+			return ~$anchor.attr( 'href' ).indexOf( "{BOARD_URL}" );
 		}
 	};
 });
 
-function add_tosrus(e, elements) {
+function add_tosrus_class(elements) {
+	// attachments
 	elements.find("dl.thumbnail a").addClass("tosrus");
 	elements.find(".attach-image img").each(function() {
 		var i = $(this).attr("src");
 		$(this).wrap('<a class="tosrus" href="' + i + '"></a>');
 	});
+
+	// [img]
+	elements.find('a').not('.tosrus').has('img').each(function() {
+		if ($.inArray( $(this).attr( 'href' ).toLowerCase().split( '.' ).pop().split( '?' )[ 0 ], [ 'jpg', 'jpe', 'jpeg', 'gif', 'png', 'bmp' ] ) > -1 && $(this).children('img').not('.smilies').length > 0)
+		{
+			$(this).addClass('tosrus');
+		}
+	});
+
+	elements.find('img').not('a img').not('.smilies').each(function() {
+		var i = $(this).attr("src");
+		$(this).wrap('<a class="tosrus" href="' + i + '"></a>');
+	});
+	
+	tosrus_resize(elements);
+}
+
+function tosrus_resize(elements) {
+	;(function ($) {
+		$.fn.bindImageLoad = function (callback) {
+			function isImageLoaded(img) {
+				// Во время события load IE и другие браузеры правильно
+				// определяют состояние картинки через атрибут complete.
+				// Исключение составляют Gecko-based браузеры.
+				if (!img.complete) {
+					return false;
+				}
+				// Тем не менее, у них есть два очень полезных свойства: naturalWidth и naturalHeight.
+				// Они дают истинный размер изображения. Если какртинка еще не загрузилась,
+				// то они должны быть равны нулю.
+				if (typeof img.naturalWidth !== "undefined" && img.naturalWidth === 0) {
+					return false;
+				}
+				// Картинка загружена.
+				return true;
+			}
+			return this.each(function () {
+				var ele = $(this);
+				if (ele.is("img") && $.isFunction(callback)) {
+					ele.one("load", callback);
+					if (isImageLoaded(this)) {
+						ele.trigger("load");
+					}
+				}
+			});
+		};
+	})(jQuery);
+
+	elements.find('a.tosrus').not('dl.thumbnail a').not('.attach-image a').bindImageLoad(function() {
+		$(this).removeAttr("width")
+		$(this).removeAttr("height")
+		$(this).css({ width: "", height: "" });
+		var h = $(this).height();
+		var w = $(this).width();
+		var size = 420; // Img tag max width
+		if (w > size || h > size) {
+			if (w > h) {
+				h = h*(size/w);
+				w = size;
+			} else {
+				w = w*(size/h);
+				h = size;
+			}
+			$(this).width(w);
+			$(this).height(h);
+		}
+	});
+}
+
+function add_tosrus(e, elements) {
+	add_tosrus_class(elements);
+
 	$("a.tosrus").tosrus({
 		pagination : {
 			add        : true,
@@ -30,14 +103,10 @@ function add_tosrus(e, elements) {
 }
 
 function separate_add_tosrus(e, elements) {
-	elements.find("dl.thumbnail a").addClass("tosrus");
-	elements.find(".attach-image img").each(function() {
-		var i = $(this).attr("src");
-		$(this).wrap('<a class="tosrus" href="' + i + '"></a>');
-	});
+	add_tosrus_class(elements);
 
-	elements.find('.attachbox').each(function() {
-		$(this).parent('.postbody').find('a.tosrus').tosrus({
+	elements.find('.postbody').each(function() {
+		$(this).find('a.tosrus').tosrus({
 			pagination : {
 				add        : true,
 				type       : "thumbnails"
