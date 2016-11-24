@@ -7,7 +7,7 @@
 jQuery(function( $ ) {
 	$.tosrus.defaults.media.image = {
 		filterAnchors: function( $anchor ) {
-			return ~$anchor.attr( 'href' ).indexOf( "{BOARD_URL}" );
+			return true;
 		}
 	};
 });
