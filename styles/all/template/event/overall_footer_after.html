@@ -25,6 +25,44 @@ function add_tosrus_class(elements) {
 		if ($.inArray( $(this).attr( 'href' ).toLowerCase().split( '.' ).pop().split( '?' )[ 0 ], [ 'jpg', 'jpe', 'jpeg', 'gif', 'png', 'bmp' ] ) > -1 && $(this).children('img').not('.smilies').length > 0)
 		{
 			$(this).addClass('tosrus');
+		} else {
+			if (~$(this).attr('href').toLowerCase().indexOf('//img-fotki.yandex.ru')) {
+				$(this).addClass('tosrus');
+			} else if (~$(this).attr('href').toLowerCase().indexOf('//fotki.yandex.ru')) {
+				var img_url = $(this).children('img').attr('src');
+				var img_reg = /(.*)_([a-zA-Z]*)(\.[a-zA-Z]*)$/;
+				var new_url_arr;
+
+				if (new_url_arr = img_reg.exec(img_url)) {
+					$(this).attr('href', new_url_arr[1] + '_orig' + new_url_arr[3]).addClass('tosrus');
+				} else {
+					img_reg = /(.*)_([a-zA-Z]*)$/;
+					if (new_url_arr = img_reg.exec(img_url)) {
+						$(this).attr('href', new_url_arr[1] + '_orig').addClass('tosrus');
+					}
+				}
+			} else if (~$(this).attr('href').toLowerCase().indexOf('//i-fotki.info')) {
+				var img_url = $(this).children('img').attr('src');
+				var new_url = img_url.replace('/thumb/', '/org/');
+
+				$(this).attr('href', new_url).addClass('tosrus');
+			} else if (~$(this).attr('href').toLowerCase().indexOf('//radikal.ru')) {
+				var img_url = $(this).children('img').attr('src');
+				var img_reg = /(.*)(\.[a-zA-Z]*)$/;
+				var new_url_arr;
+
+				if (new_url_arr = img_reg.exec(img_url)) {
+					$(this).attr('href', new_url_arr[1].slice(0, -1) + new_url_arr[2]).addClass('tosrus');
+				}
+			} else if (~$(this).attr('href').toLowerCase().indexOf('//vfl.ru')) {
+				var img_url = $(this).children('img').attr('src');
+				var img_reg = /(.*)_([a-zA-Z]*)(\.[a-zA-Z]*)$/;
+				var new_url_arr;
+
+				if (new_url_arr = img_reg.exec(img_url)) {
+					$(this).attr('href', new_url_arr[1] + new_url_arr[3]).addClass('tosrus');
+				}
+			}
 		}
 	});
 
@@ -118,7 +156,7 @@ function separate_add_tosrus(e, elements) {
 	});
 }
 $(document).ready(function (e) {
-	add_tosrus(e, $(document));
+	add_tosrus(e, $('.post'));
 });
 $('#qr_posts').on('qr_completed', add_tosrus);
 $('#qr_postform').on('ajax_submit_preview', function (e) {
