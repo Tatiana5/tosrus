@@ -25,6 +25,13 @@ function add_tosrus_class(elements) {
 		if ($.inArray( $(this).attr( 'href' ).toLowerCase().split( '.' ).pop().split( '?' )[ 0 ], [ 'jpg', 'jpe', 'jpeg', 'gif', 'png', 'bmp' ] ) > -1 && $(this).children('img').not('.smilies').length > 0)
 		{
 			$(this).addClass('tosrus');
+			
+			if (~$(this).attr('href').toLowerCase().indexOf('//pixs.ru')) {
+				var img_url = $(this).children('img').attr('src');
+				var new_url = img_url.replace('/thumbs/', '/storage/');
+
+				$(this).attr('href', new_url);
+			}
 		} else {
 			if (~$(this).attr('href').toLowerCase().indexOf('//img-fotki.yandex.ru')) {
 				$(this).addClass('tosrus');
@@ -105,7 +112,7 @@ function tosrus_resize(elements) {
 		};
 	})(jQuery);
 
-	elements.find('a.tosrus').not('dl.thumbnail a').not('.attach-image a').bindImageLoad(function() {
+	elements.find('a.tosrus img').not('dl.thumbnail a img').not('.attach-image a img').bindImageLoad(function() {
 		$(this).removeAttr("width")
 		$(this).removeAttr("height")
 		$(this).css({ width: "", height: "" });
@@ -156,7 +163,7 @@ function separate_add_tosrus(e, elements) {
 	});
 }
 $(document).ready(function (e) {
-	add_tosrus(e, $('.post'));
+	add_tosrus(e, $('.post .content'));
 });
 $('#qr_posts').on('qr_completed', add_tosrus);
 $('#qr_postform').on('ajax_submit_preview', function (e) {
